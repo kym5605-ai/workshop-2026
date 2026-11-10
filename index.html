@@ -1287,8 +1287,8 @@ function apply(st){
   S.cN=st.cN||0; S.pN=st.pN||0; S.cCounts=st.cCounts||{}; S.pCounts=st.pCounts||{};
   S.cRev={forced:!!st.forced_c,final:st.final_c||null}; S.pRev={forced:!!st.forced_p,final:st.final_p||null};
   const me=st.me; S.myVote=me?me.course:null; S.myParty=me?me.venue:null;
-  if(me&&me.name){S.myName=me.name;} else if(!S.myName){S.myName=null;}
-  if(!me&&S.myName&&!(st.names||[]).includes(S.myName)){S.myName=null;}
+  if(me&&me.name){S.myName=me.name;store.set('name',me.name);}
+  else if(S.myName){S.myName=null;store.del('name');} // 이번 라운드에 투표하지 않은 기기는 예전 라운드의 이름을 버립니다
   if(!S.ready){S.ready=true;S.noDb=false;render(false);if(!store.get('tour')&&S.view==='overview') setTimeout(tourStart,400);return;}
   if(changed){ const ae=document.activeElement; if(!(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.tagName==='SELECT'))) render(false); }
 }
