@@ -518,6 +518,13 @@ body{font-family:"Pretendard","Pretendard Variable","Noto Sans KR","Apple SD Got
 .toast{border-radius:10px;background:var(--ink);font-weight:600}
 .tools{border-style:solid;border-color:var(--line);border-radius:12px}
 .whoami b{color:var(--accent)}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-flex;align-items:center;gap:2px;padding:6px 4px 6px 12px;border-radius:999px;background:var(--accent-soft);color:var(--deep);font-weight:700;font-size:14px}
+.tag button{border:0;background:none;color:inherit;font:inherit;font-size:16px;line-height:1;padding:0 6px;cursor:pointer;opacity:.6}
+.tag button:hover{opacity:1}
+.tags-empty{font-size:13px;color:var(--muted)}
+.field button{min-height:44px}
+.field button[disabled]{opacity:.5;cursor:default}
 
 @media (min-width:768px){
   .hero{margin:20px 0 0;border-radius:18px;aspect-ratio:21/9}
@@ -625,12 +632,12 @@ const S = {
   srv:{cRev:false,pRev:false,names:[],votedC:[],votedP:[]}, myName:null, nameDraft:null, err:'',
   myVote:null, draft:null, cCounts:{}, cN:0, cRev:{forced:false,final:null},
   myParty:null, partyDraft:null, pCounts:{}, pN:0, pRev:{forced:false,final:null},
-  config:{budget:'', deadline:'', threshold:0, round:'r1'}, toolsOpen:false
+  config:{threshold:0, round:'r1'}, toolsOpen:false
 };
 let db=null;
 
 function vOverview(){
-  const b=S.config.budget, d=S.config.deadline, st=stage();
+  const st=stage();
   return `
   <section class="hero">
     <img src="${CAMP_PHOTOS[4].src}" alt="">
@@ -641,9 +648,8 @@ function vOverview(){
     <div class="stat"><b>${PEOPLE}<small>명</small></b><span>참석 인원</span></div>
     <div class="stat"><b>${TH()}<small>명</small></b><span>투표 인원</span></div>
     <div class="stat wide"><b>11.20<small>금</small></b><span>1박 2일 코스는 11.21 토까지</span></div>
-    <div class="stat wide"><b>${b?esc(b):'90<small>만원</small>'}</b><span>예산 · 기본 회식비</span></div>
+    <div class="stat wide"><b>90<small>만원</small></b><span>예산 · 기본 회식비</span></div>
   </div>
-  ${d?`<p class="small" style="margin-top:12px">투표 마감 ${esc(d)}</p>`:''}
   <h2 class="h-m">진행 순서</h2>
   <ol class="flow">
     <li class="${st>=0?'on':''}"><i>1</i><p>코스 2개 중<br>1개 투표</p></li>
@@ -661,13 +667,10 @@ function adminLogin(){
 function ownerConfig(){
   return `<h2 class="h-m">관리</h2>
   <div style="display:grid;gap:8px">
-    <label class="small" for="cfg-b">예산 표시 변경 (비우면 90만원)</label>
-    <div class="field"><input id="cfg-b" value="${esc(S.config.budget||'')}"><button data-act="cfg" data-k="budget" data-in="cfg-b">저장</button></div>
-    <label class="small" for="cfg-d">투표 마감 (예: 11.13 목 18시)</label>
-    <div class="field"><input id="cfg-d" value="${esc(S.config.deadline||'')}"><button data-act="cfg" data-k="deadline" data-in="cfg-d">저장</button></div>
-    <label class="small" for="cfg-n">팀원 명단 (쉼표나 줄바꿈으로 구분)</label>
-    <textarea id="cfg-n" rows="3" style="border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--bg);color:var(--ink);font:inherit">${esc(NAMES().join(', '))}</textarea>
-    <div class="field"><button data-act="names" style="flex:1">명단 저장 (${NAMES().length}명)</button><button data-act="logout">관리자 나가기</button></div>
+    <label class="small" for="cfg-n">팀원 명단 (이름 입력 후 Enter)</label>
+    <div class="tags">${draftNames().length?draftNames().map(n=>`<span class="tag">${esc(n)}<button data-act="name-del" data-n="${esc(n)}" aria-label="${esc(n)} 삭제">×</button></span>`).join(''):'<span class="tags-empty">등록된 이름이 없습니다.</span>'}</div>
+    <div class="field"><input id="cfg-n" placeholder="이름"><button data-act="name-add">추가</button></div>
+    <div class="field"><button data-act="names" style="flex:1" ${namesDirty()?'':'disabled'}>${namesDirty()?'명단 저장':'저장됨'} (${draftNames().length}명)</button><button data-act="logout">관리자 나가기</button></div>
   </div>
   ${testTools()}`;
 }
@@ -796,6 +799,14 @@ function vDetail(c){
 /* ---------- 단계 계산 ---------- */
 const TH=()=> (S.config.threshold>0?S.config.threshold:VOTERS);
 const NAMES=()=> S.srv.names||[];
+const draftNames=()=> S.namesDraft||NAMES();
+const namesDirty=()=> !!S.namesDraft && S.namesDraft.join('\n')!==NAMES().join('\n');
+function addNames(raw){
+  const add=raw.split(/[,\n]/).map(x=>x.trim()).filter(Boolean);
+  if(!add.length) return;
+  S.namesDraft=[...new Set([...draftNames(),...add])];
+  render(false); const i=document.getElementById('cfg-n'); if(i) i.focus();
+}
 function topOf(counts,ids){
   const ns=ids.map(id=>counts[id]||0), m=Math.max(...ns);
   const top=ids.filter((id,k)=>ns[k]===m);
@@ -1131,6 +1142,7 @@ document.addEventListener('change',e=>{
 const ERR={name_taken:'이 이름은 다른 기기에서 이미 투표했습니다. 본인 이름이 맞다면 처음 투표한 기기에서 바꿔 주세요.',unknown_name:'명단에 없는 이름입니다.',closed:'결과가 공개되어 투표가 마감되었습니다.',party_closed:'파티룸 투표가 아직 열리지 않았습니다.',token_used:'이 기기에서는 이미 다른 이름으로 투표했습니다.',bad_pin:'PIN이 맞지 않습니다.'};
 const errMsg=e=>{const m=String(e&&e.message||e);const k=Object.keys(ERR).find(x=>m.includes(x));return k?ERR[k]:'저장하지 못했습니다. 잠시 후 다시 시도해 주세요.';};
 async function adminDo(action,value){ await rpc('ws26_admin',{p_pin:S.pin,p_action:action,p_value:value===undefined?null:value}); await refresh(); }
+document.addEventListener('keydown',e=>{ if(e.target.id==='cfg-n'&&e.key==='Enter'&&!e.isComposing){ e.preventDefault(); addNames(e.target.value); } });
 document.addEventListener('change',e=>{ if(e.target.id==='np'){S.nameDraft=e.target.value||null;render(false);} });
 document.addEventListener('click',async e=>{
   const b=e.target.closest('[data-act]'); if(!b) return;
@@ -1148,10 +1160,12 @@ document.addEventListener('click',async e=>{
       const pin=document.getElementById('pin').value.trim();
       await rpc('ws26_admin',{p_pin:pin,p_action:'check',p_value:null});
       S.pin=pin; S.isAdmin=true; store.set('pin',pin); toast('관리자 모드입니다'); render(false);
-    }else if(act==='logout'){ S.isAdmin=false; S.pin=''; store.del('pin'); render(false);
+    }else if(act==='logout'){ S.isAdmin=false; S.pin=''; S.namesDraft=null; store.del('pin'); render(false);
+    }else if(act==='name-add'){ addNames(document.getElementById('cfg-n').value);
+    }else if(act==='name-del'){ S.namesDraft=draftNames().filter(n=>n!==b.dataset.n); render(false);
     }else if(act==='names'){
-      const list=[...new Set(document.getElementById('cfg-n').value.split(/[,\n]/).map(x=>x.trim()).filter(Boolean))];
-      await adminDo('names',list); toast(list.length+'명 명단을 저장했습니다');
+      const list=draftNames();
+      await adminDo('names',list); S.namesDraft=null; render(false); toast(list.length+'명 명단을 저장했습니다');
     }else if(act==='c-force'){ await adminDo('forced_c',true);
     }else if(act==='c-unforce'){ await adminDo('forced_c',false);
     }else if(act==='c-final'){ await adminDo('final_c',b.dataset.v);
@@ -1163,8 +1177,6 @@ document.addEventListener('click',async e=>{
     }else if(act==='t-new'){
       if(!confirm('지금까지의 모든 표를 무시하고 투표를 처음부터 다시 시작할까요?')) return;
       await adminDo('new_round'); S.draft=null; S.partyDraft=null; toast('투표를 처음부터 다시 시작합니다');
-    }else if(act==='cfg'){
-      await adminDo(b.dataset.k,document.getElementById(b.dataset.in).value.trim()); toast('저장했습니다');
     }
   }catch(err){
     S.busy=false; const m=errMsg(err);
@@ -1190,7 +1202,7 @@ function apply(st){
   if(!st) return;
   const js=JSON.stringify(st); const changed=js!==lastJSON; lastJSON=js;
   S.srv={cRev:!!st.cRev,pRev:!!st.pRev,names:st.names||[],votedC:st.votedC||[],votedP:st.votedP||[]};
-  S.config={budget:st.budget||'',deadline:st.deadline||'',threshold:+st.threshold||0,round:st.round||'r1'};
+  S.config={threshold:+st.threshold||0,round:st.round||'r1'};
   S.cN=st.cN||0; S.pN=st.pN||0; S.cCounts=st.cCounts||{}; S.pCounts=st.pCounts||{};
   S.cRev={forced:!!st.forced_c,final:st.final_c||null}; S.pRev={forced:!!st.forced_p,final:st.final_p||null};
   const me=st.me; S.myVote=me?me.course:null; S.myParty=me?me.venue:null;
