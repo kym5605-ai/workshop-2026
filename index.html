@@ -525,6 +525,24 @@ body{font-family:"Pretendard","Pretendard Variable","Noto Sans KR","Apple SD Got
 .tags-empty{font-size:13px;color:var(--muted)}
 .field button{min-height:44px}
 .field button[disabled]{opacity:.5;cursor:default}
+/* 이용 가이드 */
+.tour{position:fixed;inset:0;z-index:40}
+.tour-hole{position:fixed;border-radius:14px;box-shadow:0 0 0 200vmax rgba(20,12,8,.62);transition:top .3s,left .3s,width .3s,height .3s;pointer-events:none}
+.tour-hole.none{top:50%!important;left:50%!important;width:0!important;height:0!important}
+.tour-card{position:fixed;left:16px;right:16px;margin:0 auto;max-width:440px;background:var(--bg);color:var(--ink);border-radius:16px;padding:18px 18px 14px;display:grid;gap:8px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.tour-card.at-bottom{bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.tour-card.at-top{top:calc(16px + env(safe-area-inset-top,0px))}
+.tour-card.at-mid{top:50%;transform:translateY(-50%)}
+.tour-n{font-size:12px;font-weight:800;color:var(--accent)}
+.tour-card b{font-weight:800;font-size:19px;letter-spacing:-0.02em}
+.tour-card p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.tour-dots{display:flex;gap:4px;margin-top:4px}
+.tour-dots i{width:6px;height:6px;border-radius:3px;background:var(--line)}
+.tour-dots i.on{width:16px;background:var(--accent)}
+.tour-nav{display:flex;gap:8px;align-items:center;margin-top:6px}
+.tour-nav .skip{margin-right:auto;border:0;background:none;color:var(--muted);font:inherit;font-size:14px;cursor:pointer;padding:8px 0}
+.tour-nav .btn{padding:11px 16px;font-size:15px}
+.guide-link{margin-top:16px}
 
 @media (min-width:768px){
   .hero{margin:20px 0 0;border-radius:18px;aspect-ratio:21/9}
@@ -545,6 +563,7 @@ body{font-family:"Pretendard","Pretendard Variable","Noto Sans KR","Apple SD Got
 </div><div class="stepper" id="stepper"></div></header>
 <main class="wrap" id="app"></main>
 <div class="overlay" id="overlay" role="dialog" aria-live="assertive"></div>
+<div class="tour" id="tour" role="dialog" aria-modal="true" aria-label="이용 가이드" hidden></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -657,6 +676,7 @@ function vOverview(){
     <li class="${st>=2?'on':''}"><i>3</i><p>코스 2 선정 시<br>파티룸 3곳 중 1곳 투표</p></li>
     <li class="${st>=3?'on':''}"><i>4</i><p>최종 결과<br>요약</p></li>
   </ol>
+  <button class="btn ghost guide-link" data-act="tour">이용 가이드 다시 보기</button>
   ${S.isAdmin?ownerConfig():adminLogin()}`;
 }
 
@@ -1083,6 +1103,66 @@ function animateBars(){
   document.querySelectorAll('.n[data-n]').forEach(e=>{const to=+e.dataset.n;if(e.textContent!=='0표')return;let k=0;const step=()=>{k++;e.textContent=Math.round(to*Math.min(1,k/24))+'표';if(k<24)requestAnimationFrame(step);};requestAnimationFrame(step);});
 }
 
+/* ---------- 이용 가이드 ---------- */
+const TOUR=[
+  {v:'overview',q:'.hero',t:'워크샵 한눈에 보기',d:'11월 20일(금) 가을 워크샵입니다. 코스 2개 중 하나를 팀 투표로 정합니다.'},
+  {v:'overview',q:'.now',t:'지금 할 일',d:'현재 단계에서 할 일과 참여 현황이 여기에 나옵니다. 버튼을 누르면 해당 화면으로 바로 갑니다.'},
+  {v:'overview',q:'.stats',t:'기본 정보',d:'참석 인원, 투표 인원, 일정, 예산입니다.'},
+  {v:'overview',q:'.flow',t:'진행 순서',d:'코스 투표, 결과 공개, 파티룸 투표, 최종 결과 순서로 진행합니다. 파티룸 투표는 코스 2가 뽑혔을 때만 합니다.'},
+  {v:'overview',q:'#stepper',t:'진행 표시',d:'어느 화면에서든 지금 몇 단계인지 맨 위에서 확인할 수 있습니다.'},
+  {v:'courses',q:'.cards',t:'코스 비교',d:'두 코스의 사진, 일정, 예상 비용을 나란히 봅니다. 카드를 누르면 상세 화면으로 갑니다.'},
+  {v:'course-1',q:'.mapbox,.flow-line',t:'이동 경로',d:'어디서 어디로 이동하는지 보여 줍니다. 아래 버튼으로 네이버 지도 길찾기를 열 수 있습니다.'},
+  {v:'course-1',q:'.split',t:'일정과 비용',d:'시간대별 일정과 항목별 예상 비용입니다. 10명 합계와 1인 금액을 같이 비교해 주세요.'},
+  {v:'course-2',q:'.venues',t:'파티룸 후보',d:'코스 2는 파티룸 3곳이 후보입니다. 코스 2가 뽑히면 이 중 한 곳을 다시 투표합니다.'},
+  {v:'vote',q:'.opts',t:'코스 고르기',d:'마음에 드는 코스 하나를 누릅니다.'},
+  {v:'vote',q:'.namepick',t:'본인 이름 고르기',d:'명단에서 본인 이름을 고르고 투표 버튼을 누릅니다. 이름당 1표입니다. 다른 사람 이름을 고르면 그 사람이 투표할 수 없습니다.'},
+  {v:'vote',q:'.meter',t:'참여 현황',d:()=>`${TH()}명이 모두 투표하면 결과가 자동으로 공개됩니다. 공개 전까지는 선택을 바꿀 수 있고, 누가 어디에 투표했는지는 공개되지 않습니다.`},
+];
+let tourI=-1, tourFrom='overview';
+function tourEl(){ const st=TOUR[tourI]; return st&&st.q.split(',').map(q=>document.querySelector(q)).find(Boolean); }
+function tourStart(){ tourFrom=S.view; tourShow(0); }
+function tourEnd(dest){ tourI=-1; const el=document.getElementById('tour'); el.hidden=true; el.innerHTML=''; store.set('tour','1'); go(dest||tourFrom); }
+function tourShow(i){
+  tourI=i; const st=TOUR[i], last=i===TOUR.length-1;
+  if(S.view!==st.v) go('#'+st.v);
+  const box=document.getElementById('tour'); box.hidden=false;
+  box.innerHTML=`<div class="tour-hole"></div><div class="tour-card">
+    <span class="tour-n">이용 가이드 ${i+1} / ${TOUR.length}</span>
+    <b>${st.t}</b><p>${typeof st.d==='function'?st.d():st.d}</p>
+    <div class="tour-dots">${TOUR.map((x,k)=>`<i class="${k===i?'on':''}"></i>`).join('')}</div>
+    <div class="tour-nav"><button class="skip" data-tour="end">${last?'닫기':'건너뛰기'}</button>
+      ${i?'<button class="btn ghost" data-tour="prev">이전</button>':''}
+      <button class="btn accent" data-tour="${last?'done':'next'}">${last?'투표하러 가기':'다음'}</button></div></div>`;
+  const el=tourEl();
+  if(el){ const hh=st.q==='#stepper'?0:document.querySelector('.top').offsetHeight; const r=el.getBoundingClientRect();
+    if(hh) window.scrollTo(0,Math.max(0,r.top+window.scrollY-hh-Math.max(16,(innerHeight-hh-r.height)/3))); }
+  tourPlace();
+  box.querySelector('[data-tour="next"],[data-tour="done"]').focus();
+}
+function tourPlace(){
+  if(tourI<0) return;
+  const box=document.getElementById('tour'), hole=box.querySelector('.tour-hole'), card=box.querySelector('.tour-card'), el=tourEl();
+  if(!el){ hole.className='tour-hole none'; card.className='tour-card at-mid'; return; }
+  const r=el.getBoundingClientRect(), pad=6;
+  const top=Math.max(0,r.top-pad), bot=Math.min(innerHeight,r.bottom+pad);
+  Object.assign(hole.style,{top:top+'px',left:(r.left-pad)+'px',width:(r.width+pad*2)+'px',height:Math.max(0,bot-top)+'px'});
+  hole.className='tour-hole';
+  card.className='tour-card '+((top+bot)/2<innerHeight/2?'at-bottom':'at-top');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-tour]'); if(!b) return;
+  const a=b.dataset.tour;
+  if(a==='next') tourShow(tourI+1); else if(a==='prev') tourShow(tourI-1);
+  else if(a==='done') tourEnd('#courses'); else tourEnd();
+});
+document.addEventListener('keydown',e=>{
+  if(tourI<0) return;
+  if(e.key==='Escape') tourEnd();
+  else if(e.key==='ArrowRight'&&tourI<TOUR.length-1) tourShow(tourI+1);
+  else if(e.key==='ArrowLeft'&&tourI>0) tourShow(tourI-1);
+});
+addEventListener('resize',tourPlace); addEventListener('scroll',tourPlace,{passive:true});
+
 /* ---------- 라우팅 ---------- */
 const VIEWS=['overview','courses','course-1','course-2','vote','party','result','party-result','final'];
 function go(h){
@@ -1128,7 +1208,7 @@ function render(scroll){
   const resA=document.querySelector('.steps a[data-v="result"]'); resA.href=resultHref(); resA.hidden=!cRevealed();
   document.querySelectorAll('.steps a').forEach(a=>{ if(a.dataset.v===navV) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
   if(scroll) window.scrollTo(0,0); else window.scrollTo(0,y);
-  try{ animateBars(); checkEffects(); }catch(e){ console.error(e); }
+  try{ animateBars(); if(tourI<0) checkEffects(); else tourPlace(); }catch(e){ console.error(e); }
 }
 window.addEventListener('hashchange',route);
 
@@ -1161,6 +1241,7 @@ document.addEventListener('click',async e=>{
       await rpc('ws26_admin',{p_pin:pin,p_action:'check',p_value:null});
       S.pin=pin; S.isAdmin=true; store.set('pin',pin); toast('관리자 모드입니다'); render(false);
     }else if(act==='logout'){ S.isAdmin=false; S.pin=''; S.namesDraft=null; store.del('pin'); render(false);
+    }else if(act==='tour'){ tourStart();
     }else if(act==='name-add'){ addNames(document.getElementById('cfg-n').value);
     }else if(act==='name-del'){ S.namesDraft=draftNames().filter(n=>n!==b.dataset.n); render(false);
     }else if(act==='names'){
@@ -1208,7 +1289,7 @@ function apply(st){
   const me=st.me; S.myVote=me?me.course:null; S.myParty=me?me.venue:null;
   if(me&&me.name){S.myName=me.name;} else if(!S.myName){S.myName=null;}
   if(!me&&S.myName&&!(st.names||[]).includes(S.myName)){S.myName=null;}
-  if(!S.ready){S.ready=true;S.noDb=false;render(false);return;}
+  if(!S.ready){S.ready=true;S.noDb=false;render(false);if(!store.get('tour')&&S.view==='overview') setTimeout(tourStart,400);return;}
   if(changed){ const ae=document.activeElement; if(!(ae&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'||ae.tagName==='SELECT'))) render(false); }
 }
 async function refresh(){
