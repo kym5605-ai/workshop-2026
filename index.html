@@ -7,6 +7,7 @@
 <meta name="robots" content="noindex">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -345,6 +346,184 @@ img{max-width:100%}
 .whoami{margin:20px 0 0;font-size:14px;color:var(--muted)}
 .whoami b{color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* =========================================================
+   가을 테마 (캐치테이블 모티브)
+   ========================================================= */
+:root{
+  --bg:#FFFFFF; --surface:#F7F4F1; --band:#F3EEE9; --ink:#1E1915; --muted:#8C837B; --line:#ECE5DE;
+  --accent:#E4531F; --accent-ink:#FFFFFF; --accent-soft:#FFF1E8; --accent-mid:#F3B08C; --deep:#7B3418; --gold:#C98A2B;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#151110; --surface:#211B18; --band:#1B1614; --ink:#F3EDE7; --muted:#A1968D; --line:#332A25;
+    --accent:#FF7442; --accent-ink:#1A0E08; --accent-soft:#33201A; --accent-mid:#7A3D24; --deep:#E7A27E; --gold:#E0B060;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#151110; --surface:#211B18; --band:#1B1614; --ink:#F3EDE7; --muted:#A1968D; --line:#332A25;
+  --accent:#FF7442; --accent-ink:#1A0E08; --accent-soft:#33201A; --accent-mid:#7A3D24; --deep:#E7A27E; --gold:#E0B060;
+}
+body{font-family:"Pretendard","Pretendard Variable","Noto Sans KR","Apple SD Gothic Neo",system-ui,sans-serif;letter-spacing:-0.01em;background:var(--bg)}
+#app>*{animation:none}
+
+/* 헤더 · 탭 */
+.top{border-bottom:1px solid var(--line)}
+.brand{font-weight:800;font-size:18px;display:flex;align-items:center;gap:6px}
+.brand::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--accent);transform:rotate(45deg)}
+.steps{gap:2px}
+.steps a{border-radius:0;padding:8px 10px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent}
+.steps a[aria-current="page"]{background:none;color:var(--ink);font-weight:800;border-bottom-color:var(--ink)}
+.stepper li span{width:18px;height:18px;font-size:10px}
+.stepper li.cur span{animation:none;background:var(--accent);color:var(--accent-ink)}
+.stepper li.done span{background:var(--deep);color:var(--bg)}
+.stepper li.cur{color:var(--accent)}
+.st-bar{height:2px}
+
+/* 타이포 */
+.h-xl{font-weight:800;letter-spacing:-0.035em}
+.h-l{font-weight:800;font-size:clamp(26px,6.4vw,36px);letter-spacing:-0.03em;line-height:1.25;margin:10px 0 6px}
+.h-m{font-weight:800;font-size:19px;letter-spacing:-0.02em;margin:40px 0 14px;display:flex;align-items:center;gap:8px}
+.h-m::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--accent)}
+.sub{font-size:15px;color:var(--muted)}
+.eyebrow{margin-top:22px;font-size:13px;font-weight:700;color:var(--accent);letter-spacing:0}
+
+#app>.h-l:first-child{margin-top:28px}
+/* 히어로 */
+.hero{position:relative;margin:16px -20px 0;aspect-ratio:4/3.1;overflow:hidden;border-radius:0}
+.hero img{width:100%;height:100%;object-fit:cover;display:block;filter:saturate(1.05) sepia(.12)}
+.hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(30,18,10,0) 30%,rgba(30,18,10,.78) 100%)}
+.hero-txt{position:absolute;left:20px;right:20px;bottom:22px;z-index:1;color:#fff}
+.hero-chip{display:inline-block;font-size:12px;font-weight:700;background:var(--accent);color:#fff;border-radius:4px;padding:4px 8px}
+.hero-txt h1{margin:10px 0 6px;font-weight:800;font-size:clamp(28px,7.6vw,44px);line-height:1.2;letter-spacing:-0.035em}
+.hero-txt p{margin:0;font-size:15px;opacity:.9}
+
+/* 지금 할 일 */
+.now{background:var(--accent-soft);color:var(--ink);border-radius:14px;padding:20px;margin-top:20px;animation:none;gap:8px}
+.now-tag{color:var(--accent);opacity:1;font-weight:800}
+.now>b{font-size:20px;font-weight:800}
+.now p{opacity:1;color:var(--muted);font-size:14px}
+.now .meter{background:var(--bg);border:1px solid var(--line)}
+.now .meter .small{color:var(--muted);opacity:1}
+.now .meter-t{background:var(--surface)}
+
+/* 버튼 */
+.btn{border-radius:10px;padding:15px 20px;font-weight:700;font-size:16px;background:var(--ink);color:var(--bg)}
+.btn.accent{background:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.btn[disabled]{opacity:1;background:var(--surface);color:var(--muted);border:0}
+@media (hover:hover){.btn:hover{filter:brightness(.96)}}
+
+/* 정보 카드 */
+.stats{border-radius:14px;border-color:var(--line);background:var(--line)}
+.stat{padding:16px}
+.stat b{font-weight:800;font-size:clamp(26px,7vw,38px);letter-spacing:-0.03em}
+.stat span{font-size:13px}
+.flow li{background:var(--surface);border-radius:12px}
+.flow li i{color:var(--accent);font-weight:800;font-size:22px}
+.flow li.on{background:var(--accent-soft)}
+.meter{border-radius:12px}
+.meter-t{height:8px}
+.meter-t i{background:var(--accent)}
+
+/* 코스 카드 (식당 카드 스타일) */
+.cards{gap:24px 16px}
+.card{border:0;border-radius:0;background:transparent}
+.card .art{aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--surface)}
+.card .art img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s}
+.card:hover .art img{transform:scale(1.03)}
+.card .body{padding:12px 2px 0}
+.card .no{color:var(--accent);font-weight:700;font-size:13px}
+.card .ttl{font-weight:800;font-size:20px}
+.card .meta{font-size:13px;color:var(--muted)}
+.card .cost{font-weight:800;font-size:17px;margin-top:8px}
+.card.winner .art{outline:3px solid var(--accent);outline-offset:-3px}
+.mine{top:10px;left:10px;border-radius:4px;background:rgba(20,14,10,.75);color:#fff;font-weight:700}
+.mine.win{background:var(--accent)}
+@media (max-width:420px){.card{display:block}.card .art{aspect-ratio:4/3;height:auto}}
+
+/* 상세 */
+.cover{margin:12px -20px 0;aspect-ratio:16/10;overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover;display:block}
+.back{margin-top:16px;font-weight:600}
+.chips{gap:6px}
+.chip{background:var(--bg);border:1px solid var(--line);font-weight:600;color:var(--ink);border-radius:999px}
+.flow-line{background:var(--bg);border-color:var(--line);border-radius:14px}
+.flow-line .fd{background:var(--accent)}
+.flow-line li.o .fd{background:var(--deep);color:var(--bg)}
+.flow-line li:not(:last-child)::after{border-top-color:var(--accent-mid)}
+.mapbox{border-radius:14px;border-color:var(--line);background:var(--surface)}
+.legs .dot{background:var(--accent)}
+.legs .dot.o{background:var(--deep)}
+.maplink{border-radius:6px;font-weight:600;color:var(--ink)}
+
+/* 타임테이블 */
+.tt .blk{border-radius:10px}
+.k-move{background:var(--surface)}
+.k-food{background:#FBEAD9;color:#4A2A12}
+.k-work{background:var(--surface);box-shadow:inset 3px 0 0 var(--gold)}
+.k-share{background:var(--deep);color:#FFF6EF}
+.k-play{background:var(--accent);color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .k-food{background:#3A2A1C;color:#F6DCC2}}
+
+/* 비용 */
+.cr .tr{height:6px}
+.cr .tr i{background:var(--accent)}
+.total{background:var(--deep);color:#FFF6EF;border-radius:14px}
+.total b{font-weight:800}
+
+/* 숙소 · 파티룸 카드 */
+.stay-card,.venue{border-color:var(--line);border-radius:14px}
+.gallery figcaption{background:rgba(20,14,10,.7);border-radius:4px;font-weight:600}
+.stay-info b,.venue .vt b{font-weight:800}
+.venue.pick{border:1px solid var(--accent);background:var(--bg)}
+.venue .vt i{border-radius:4px;background:var(--accent)}
+.venue .vp{font-weight:800;color:var(--ink)}
+.venue .vg em{background:var(--surface);border-radius:4px;font-weight:600}
+.venue.selectable{border-width:1px}
+.venue.selectable:has(input:checked),.venue.selectable.chosen{border:2px solid var(--accent);background:var(--accent-soft)}
+
+/* 투표 선택지 */
+.opt{border:1px solid var(--line);border-radius:14px}
+.opt b{font-weight:800;font-size:19px}
+.opt:has(input:checked),.opt.chosen{border:2px solid var(--accent);background:var(--accent-soft)}
+.namepick select{border:1px solid var(--line);border-radius:10px}
+
+/* 결과 */
+.result{border-radius:14px;border-color:var(--line)}
+.bar .track{border-radius:6px}
+.bar .fill{background:var(--accent-mid);border-radius:6px}
+.bar.win .fill{background:var(--accent)}
+.verdict{background:var(--accent-soft);color:var(--ink);border-radius:10px}
+.verdict b{color:var(--accent)}
+.blind .track{background:repeating-linear-gradient(-45deg,var(--surface) 0 8px,var(--band) 8px 16px)}
+
+/* 알림 (바텀시트) */
+.overlay{align-items:end;padding:0;background:rgba(20,12,8,.55)}
+.ov-card{border-radius:20px 20px 0 0;width:100%;max-width:560px;padding:28px 22px calc(22px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.overlay.on .ov-card{transform:none}
+.ov-card::before{content:"";display:block;width:40px;height:4px;border-radius:2px;background:var(--line);margin:-12px auto 10px}
+.ov-tag{color:var(--accent);font-weight:800}
+.ov-t{font-weight:800;font-size:23px}
+.ov-big{background:var(--accent-soft);color:var(--accent);border-radius:12px;font-weight:800}
+@media (min-width:768px){.overlay{align-items:center;padding:24px}.ov-card{border-radius:20px;transform:translateY(24px) scale(.97)}}
+
+.support{list-style:none;margin:12px 0 0;padding:14px 16px;border-radius:12px;background:var(--accent-soft);display:grid;gap:6px}
+.support li{display:flex;justify-content:space-between;font-size:14px}
+.support li:last-child{padding-top:6px;border-top:1px solid var(--accent-mid);font-weight:800;color:var(--accent)}
+.support b{font-weight:800}
+/* 최종 */
+.final-h{font-weight:800}
+.final-photo{border-radius:14px}
+.toast{border-radius:10px;background:var(--ink);font-weight:600}
+.tools{border-style:solid;border-color:var(--line);border-radius:12px}
+.whoami b{color:var(--accent)}
+
+@media (min-width:768px){
+  .hero{margin:20px 0 0;border-radius:18px;aspect-ratio:21/9}
+  .hero-txt{left:36px;bottom:32px}
+  .cover{margin:16px 0 0;border-radius:16px;aspect-ratio:21/9}
+}
 </style>
 </head>
 <body>
@@ -436,6 +615,7 @@ const COURSES = [
 const merc=(lat,lng)=>{const k=20037508.34/180;return [(lng*k).toFixed(4),(Math.log(Math.tan((90+lat)*Math.PI/360))/(Math.PI/180)*k).toFixed(4)]};
 const npt=p=>{const m=merc(p[1],p[2]);return `${m[0]},${m[1]},${encodeURIComponent(p[0])},,`};
 const total = c => c.costs.reduce((s,x)=>s+x[1],0);
+const wonExact = n => n.toLocaleString('ko-KR')+'원';
 const won = n => n>=10000 ? (Math.round(n/1000)/10).toLocaleString('ko-KR')+'만원' : n.toLocaleString('ko-KR')+'원';
 const esc = s => String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
@@ -452,8 +632,10 @@ let db=null;
 function vOverview(){
   const b=S.config.budget, d=S.config.deadline, st=stage();
   return `
-  <h1 class="h-xl">2026<br>워크샵</h1>
-  <p class="sub">팀원 투표로 워크샵 코스를 정합니다.</p>
+  <section class="hero">
+    <img src="${CAMP_PHOTOS[4].src}" alt="">
+    <div class="hero-txt"><span class="hero-chip">2026 가을 워크샵 · 11.20 금</span><h1>가을 워크샵,<br>어디로 떠날까요?</h1><p>두 코스 중 하나를 팀 투표로 정합니다.</p></div>
+  </section>
   ${nowCard()}
   <div class="stats">
     <div class="stat"><b>${PEOPLE}<small>명</small></b><span>참석 인원</span></div>
@@ -578,7 +760,9 @@ function vDetail(c){
   const tl=c.timeline.map(x=>`<span class="t">${x[0]}</span><div class="blk ${x[5]}" style="min-height:${Math.max(40,x[2]*0.62)}px"><b>${esc(x[3])}</b>${x[4]?`<span>${esc(x[4])}</span>`:''}</div>`).join('');
   return `
   <a class="back" href="#courses">코스 목록</a>
-  <h1 class="h-l">${c.no}<br>${c.title}</h1>
+  <div class="cover"><img src="${coverOf(c)}" alt=""></div>
+  <span class="eyebrow">${c.no}</span>
+  <h1 class="h-l">${c.title}</h1>
   <p class="sub">${c.date}</p>
   <div class="chips">${c.chips.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
 
@@ -676,6 +860,7 @@ const cItems=()=>COURSES.map(c=>({id:c.id,label:c.no,full:c.no+' · '+c.title}))
 const pItems=()=>VENUES.map(v=>({id:v.id,label:v.short,full:v.name}));
 
 /* ---------- 화면 ---------- */
+const coverOf=c=> c.id==='c1'?STAY_PHOTOS[0].src:CAMP_PHOTOS[0].src;
 function vCourses(){
   return `
   <h1 class="h-l">코스</h1>
@@ -684,11 +869,11 @@ function vCourses(){
     const t=total(c), w=courseWin()===c.id;
     return `<a class="card ${w?'winner':''}" href="#course-${c.id.slice(1)}">
       ${w?'<span class="mine win">선정</span>':S.myVote===c.id?'<span class="mine">내 선택</span>':''}
-      <span class="art">${artSVG(c)}</span>
+      <span class="art"><img src="${coverOf(c)}" alt="" loading="lazy"></span>
       <span class="body" style="display:block">
         <span class="no">${c.no}</span>
         <span class="ttl" style="display:block">${c.title}</span>
-        <span class="meta" style="display:block">${c.date}</span>
+        <span class="meta" style="display:block">${c.date} · ${c.chips.slice(0,3).join(' · ')}</span>
         <span class="cost" style="display:block">${won(t)}</span>
       </span>
     </a>`}).join('')}</div>
@@ -817,7 +1002,8 @@ function vFinal(){
   <div class="final-grid">
     <figure class="final-photo">${place.photo?`<img src="${place.photo.src}" alt="${esc(place.name)}">`:''}<figcaption><b>${esc(place.name)}</b><span>${esc(place.sub||'')}</span><span>${esc(place.addr)}</span></figcaption></figure>
     <div class="final-side">
-      <div class="total"><div><span>${PEOPLE}명 예상 합계</span><br><b>${won(t)}</b></div><div class="pp"><span>1인</span><br><b>약 ${won(Math.round(t/PEOPLE/1000)*1000)}</b></div></div>
+      <div class="total"><div><span>${PEOPLE}명 예상 합계</span><br><b>${won(t)}</b></div><div class="pp"><span>1인 추가 부담</span><br><b>${t>BASE?'약 '+wonExact(Math.ceil((t-BASE)/PEOPLE/100)*100):'없음'}</b></div></div>
+      <ul class="support"><li><span>회사 지원</span><b>−${won(BASE)}</b></li><li><span>초과 금액</span><b>${won(Math.max(0,t-BASE))}</b></li><li><span>${PEOPLE}명 분담</span><b>${t>BASE?'1인 '+wonExact(Math.ceil((t-BASE)/PEOPLE/100)*100):'추가 부담 없음'}</b></li></ul>
       <ul class="final-costs">${costs.map(x=>`<li><span>${x[0]}</span><b>${won(x[1])}</b></li>`).join('')}</ul>
     </div>
   </div>
